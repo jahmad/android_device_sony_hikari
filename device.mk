@@ -88,8 +88,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libbt-vendor \
     libbluedroid \
-    brcm_patchram_plus \
-    bt_vendor.conf
+    brcm_patchram_plus
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
 # Wifi
 PRODUCT_PACKAGES += \
