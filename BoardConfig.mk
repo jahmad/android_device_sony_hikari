@@ -24,14 +24,14 @@
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_CPU_SMP := true
-TARGET_CPU_VARIANT := cortex-a8
+TARGET_CPU_VARIANT := scorpion
 TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
 
 # compile flag
 TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
-COMMON_GLOBAL_CFLAGS += -DLEGACY_BLOB_COMPATIBLE
+COMMON_GLOBAL_CFLAGS += -DQCOM_LEGACY_UIDS
 
 # display
 USE_OPENGL_RENDERER := true
@@ -75,6 +75,7 @@ WIFI_DRIVER_FW_PATH_P2P     := "/system/vendor/firmware/fw_bcmdhd.bin"
 # camera
 BOARD_USES_CAMERA_FAST_AUTOFOCUS := true
 USE_DEVICE_SPECIFIC_CAMERA := true
+COMMON_GLOBAL_CFLAGS += -DMR0_CAMERA_BLOB -DNEEDS_VECTORIMPL_SYMBOLS
 
 # fm radio
 BOARD_HAVE_FMRADIO := true
@@ -82,24 +83,20 @@ BOARD_HAVE_FMRADIO_BCM := true
 
 # kernel
 BOARD_KERNEL_MSM := true
-KERNEL_DEFCONFIG := fuji_hikari_defconfig
+TARGET_KERNEL_SOURCE := kernel/sony/fuji
+TARGET_KERNEL_CONFIG := fuji_hikari_defconfig
+
+# SELinux
+include device/qcom/sepolicy/sepolicy.mk
 
 # board
 TARGET_BOARD_PLATFORM := msm8660
 TARGET_BOOTLOADER_BOARD_NAME := fuji
-
-# Enable dex-preoptimization to speed up first boot sequence
-ifeq ($(HOST_OS),linux)
-  ifeq ($(TARGET_BUILD_VARIANT),user)
-    ifeq ($(WITH_DEXPREOPT),)
-      WITH_DEXPREOPT := true
-    endif
-  endif
-endif
-DONT_DEXPREOPT_PREBUILTS := true
+TARGET_VENDOR_PLATFORM := fuji
 
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_RECOVERY := true
+TARGET_NO_RADIOIMAGE := true
 TARGET_BOOTLOADER_TYPE := fastboot
 
 # image
@@ -113,6 +110,9 @@ BOARD_MKBOOTIMG_ARGS := \
 	out/target/product/hikari/kernel@0x40208000 \
 	out/target/product/hikari/ramdisk.img@0x41500000,ramdisk \
 	vendor/sony/hikari/proprietary/boot/RPM.bin@0x20000,rpm
+
+# CM Hardware
+BOARD_HARDWARE_CLASS := device/sony/hikari/cmhw/
 
 -include vendor/sony/hikari/BoardConfigVendor.mk
 

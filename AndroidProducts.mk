@@ -15,5 +15,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/aosp_hikari.mk \
-    $(LOCAL_DIR)/full_hikari.mk
+    $(LOCAL_DIR)/cm.mk \
