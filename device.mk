@@ -67,10 +67,10 @@ PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:system/etc/media_codecs_google_telephony.xml \
     frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml \
     frameworks/av/media/libstagefright/data/media_codecs_ffmpeg.xml:system/etc/media_codecs_ffmpeg.xml \
-    $(LOCAL_PATH)/config/media_codecs.xml:system/etc/media_codecs.xml \
-    $(LOCAL_PATH)/config/media_profiles.xml:system/etc/media_profiles.xml \
-    $(LOCAL_PATH)/config/audio_policy.conf:system/etc/audio_policy.conf \
-    $(LOCAL_PATH)/config/mixer_paths.xml:system/etc/mixer_paths.xml
+    $(LOCAL_PATH)/rootdir/system/etc/media_codecs.xml:system/etc/media_codecs.xml \
+    $(LOCAL_PATH)/rootdir/system/etc/media_profiles.xml:system/etc/media_profiles.xml \
+    $(LOCAL_PATH)/rootdir/system/etc/audio_policy.conf:system/etc/audio_policy.conf \
+    $(LOCAL_PATH)/rootdir/system/etc/mixer_paths.xml:system/etc/mixer_paths.xml
 
 # NFC
 PRODUCT_PACKAGES += \
@@ -82,7 +82,7 @@ PRODUCT_PACKAGES += \
     com.android.nfc_extras
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/nfcee_access.xml:system/etc/nfcee_access.xml
+    $(LOCAL_PATH)/rootdir/system/etc/nfcee_access.xml:system/etc/nfcee_access.xml
 
 # Bluetooth
 PRODUCT_PACKAGES += \
@@ -91,7 +91,7 @@ PRODUCT_PACKAGES += \
     brcm_patchram_plus
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
+    $(LOCAL_PATH)/rootdir/system/etc/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
 # Wifi
 PRODUCT_PACKAGES += \
@@ -103,7 +103,7 @@ PRODUCT_PACKAGES += \
     wpa_supplicant.conf
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/calibration:system/etc/wifi/calibration
+    $(LOCAL_PATH)/rootdir/system/etc/wifi/calibration:system/etc/wifi/calibration
 
 WIFI_BAND := 802_11_BG
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
@@ -113,11 +113,11 @@ PRODUCT_PACKAGES += \
     sensors.msm8660
 
 PRODUCT_COPY_FILES += \
-   $(LOCAL_PATH)/config/sensors.conf:system/etc/sensors.conf
+   $(LOCAL_PATH)/rootdir/system/etc/sensors.conf:system/etc/sensors.conf
 
 # GPS
 PRODUCT_COPY_FILES += \
-     $(LOCAL_PATH)/config/gps.conf:system/etc/gps.conf
+     $(LOCAL_PATH)/rootdir/system/etc/gps.conf:system/etc/gps.conf
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
@@ -147,32 +147,32 @@ PRODUCT_COPY_FILES += \
 
 # Configuration scripts
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/flashled_calc_parameters.cfg:system/etc/flashled_calc_parameters.cfg \
-    $(LOCAL_PATH)/config/iddd.conf:system/etc/iddd.conf \
-    $(LOCAL_PATH)/config/qosmgr_rules.xml:system/etc/qosmgr_rules.xml \
-    $(LOCAL_PATH)/config/thermald-semc.conf:system/etc/thermald-semc.conf
+    $(LOCAL_PATH)/rootdir/system/etc/flashled_calc_parameters.cfg:system/etc/flashled_calc_parameters.cfg \
+    $(LOCAL_PATH)/rootdir/system/etc/iddd.conf:system/etc/iddd.conf \
+    $(LOCAL_PATH)/rootdir/system/etc/qosmgr_rules.xml:system/etc/qosmgr_rules.xml \
+    $(LOCAL_PATH)/rootdir/system/etc/thermald-semc.conf:system/etc/thermald-semc.conf
 
 # Common Qualcomm / Sony scripts
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/init.usbmode.sh:root/init.usbmode.sh \
-    $(LOCAL_PATH)/config/init.qcom.sh:root/init.qcom.sh \
-    $(LOCAL_PATH)/config/init.qcom.class_core.sh:root/init.qcom.class_core.sh \
-    $(LOCAL_PATH)/config/init.qcom.class_main.sh:root/init.qcom.class_main.sh \
-    $(LOCAL_PATH)/config/init.netconfig.sh:system/etc/init.netconfig.sh \
-    $(LOCAL_PATH)/config/init.qcom.efs.sync.sh:system/etc/init.qcom.efs.sync.sh \
-    $(LOCAL_PATH)/config/init.qcom.fm.sh:system/etc/init.qcom.fm.sh \
-    $(LOCAL_PATH)/config/init.qcom.post_boot.sh:system/etc/init.qcom.post_boot.sh \
-    $(LOCAL_PATH)/config/pre_hw_config.sh:system/etc/pre_hw_config.sh \
-    $(LOCAL_PATH)/config/hw_config.sh:system/etc/hw_config.sh \
-    $(LOCAL_PATH)/config/clearpad_fwloader.sh:system/etc/clearpad_fwloader.sh
+    $(LOCAL_PATH)/rootdir/init.usbmode.sh:root/init.usbmode.sh \
+    $(LOCAL_PATH)/rootdir/init.qcom.sh:root/init.qcom.sh \
+    $(LOCAL_PATH)/rootdir/init.qcom.class_core.sh:root/init.qcom.class_core.sh \
+    $(LOCAL_PATH)/rootdir/init.qcom.class_main.sh:root/init.qcom.class_main.sh \
+    $(LOCAL_PATH)/rootdir/system/etc/init.netconfig.sh:system/etc/init.netconfig.sh \
+    $(LOCAL_PATH)/rootdir/system/etc/init.qcom.efs.sync.sh:system/etc/init.qcom.efs.sync.sh \
+    $(LOCAL_PATH)/rootdir/system/etc/init.qcom.fm.sh:system/etc/init.qcom.fm.sh \
+    $(LOCAL_PATH)/rootdir/system/etc/init.qcom.post_boot.sh:system/etc/init.qcom.post_boot.sh \
+    $(LOCAL_PATH)/rootdir/system/etc/pre_hw_config.sh:system/etc/pre_hw_config.sh \
+    $(LOCAL_PATH)/rootdir/system/etc/hw_config.sh:system/etc/hw_config.sh \
+    $(LOCAL_PATH)/rootdir/system/etc/clearpad_fwloader.sh:system/etc/clearpad_fwloader.sh
 
 # Custom init / uevent
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/fstab.semc:root/fstab.semc \
-    $(LOCAL_PATH)/config/init.semc.rc:root/init.semc.rc \
-    $(LOCAL_PATH)/config/init.sony.rc:root/init.sony.rc \
-    $(LOCAL_PATH)/config/init.sony-platform.rc:root/init.sony-platform.rc \
-    $(LOCAL_PATH)/config/ueventd.semc.rc:root/ueventd.semc.rc
+    $(LOCAL_PATH)/rootdir/fstab.semc:root/fstab.semc \
+    $(LOCAL_PATH)/rootdir/init.semc.rc:root/init.semc.rc \
+    $(LOCAL_PATH)/rootdir/init.sony.rc:root/init.sony.rc \
+    $(LOCAL_PATH)/rootdir/init.sony-platform.rc:root/init.sony-platform.rc \
+    $(LOCAL_PATH)/rootdir/ueventd.semc.rc:root/ueventd.semc.rc
 
 PRODUCT_PACKAGES += \
     busybox-static \
@@ -194,14 +194,14 @@ PRODUCT_PACKAGES += \
 
 # Key layouts and touchscreen
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/clearpad.idc:system/usr/idc/clearpad.idc \
-    $(LOCAL_PATH)/config/clearpad.kl:system/usr/keylayout/clearpad.kl \
-    $(LOCAL_PATH)/config/fuji-keypad.kl:system/usr/keylayout/fuji-keypad.kl \
-    $(LOCAL_PATH)/config/gpio-key.kl:system/usr/keylayout/gpio-key.kl \
-    $(LOCAL_PATH)/config/keypad-pmic-fuji.kl:system/usr/keylayout/keypad-pmic-fuji.kl \
-    $(LOCAL_PATH)/config/pmic8058_pwrkey.kl:system/usr/keylayout/pmic8058_pwrkey.kl \
-    $(LOCAL_PATH)/config/simple_remote.kl:system/usr/keylayout/simple_remote.kl \
-    $(LOCAL_PATH)/config/simple_remote_appkey.kl:system/usr/keylayout/simple_remote_appkey.kl
+    $(LOCAL_PATH)/rootdir/system/usr/idc/clearpad.idc:system/usr/idc/clearpad.idc \
+    $(LOCAL_PATH)/rootdir/system/usr/keylayout/clearpad.kl:system/usr/keylayout/clearpad.kl \
+    $(LOCAL_PATH)/rootdir/system/usr/keylayout/fuji-keypad.kl:system/usr/keylayout/fuji-keypad.kl \
+    $(LOCAL_PATH)/rootdir/system/usr/keylayout/gpio-key.kl:system/usr/keylayout/gpio-key.kl \
+    $(LOCAL_PATH)/rootdir/system/usr/keylayout/keypad-pmic-fuji.kl:system/usr/keylayout/keypad-pmic-fuji.kl \
+    $(LOCAL_PATH)/rootdir/system/usr/keylayout/pmic8058_pwrkey.kl:system/usr/keylayout/pmic8058_pwrkey.kl \
+    $(LOCAL_PATH)/rootdir/system/usr/keylayout/simple_remote.kl:system/usr/keylayout/simple_remote.kl \
+    $(LOCAL_PATH)/rootdir/system/usr/keylayout/simple_remote_appkey.kl:system/usr/keylayout/simple_remote_appkey.kl
 
 PRODUCT_PROPERTY_OVERRIDES += \
     qemu.hw.mainkeys=1

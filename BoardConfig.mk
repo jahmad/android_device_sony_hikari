@@ -35,7 +35,7 @@ COMMON_GLOBAL_CFLAGS += -DQCOM_LEGACY_UIDS
 
 # display
 USE_OPENGL_RENDERER := true
-BOARD_EGL_CFG := device/sony/hikari/config/egl.cfg
+BOARD_EGL_CFG := device/sony/hikari/rootdir/system/lib/egl/egl.cfg
 
 TARGET_USES_ION := true
 TARGET_USES_OVERLAY := true
