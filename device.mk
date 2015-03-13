@@ -203,22 +203,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/simple_remote.kl:system/usr/keylayout/simple_remote.kl \
     $(LOCAL_PATH)/config/simple_remote_appkey.kl:system/usr/keylayout/simple_remote_appkey.kl
 
-# Software
-PRODUCT_PACKAGES += \
-    libemoji \
-    e2fsck \
-    fsck_msdos \
-    fsck.f2fs \
-    mkfs.f2fs \
-    Email \
-    Stk
-
-PRODUCT_PACKAGES += \
-    busybox
-
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/bootanimation.zip:system/media/bootanimation.zip
-
 PRODUCT_PROPERTY_OVERRIDES += \
     qemu.hw.mainkeys=1
 

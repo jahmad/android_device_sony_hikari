@@ -136,14 +136,6 @@ stathub.enabled=0
 #
 keyguard.no_require_sim=true
 ro.vendor.extension_library=/system/lib/libqc-opt.so
-dalvik.vm.dexopt-flags=m=y
-dalvik.vm.heapstartsize=8m
-dalvik.vm.heapgrowthlimit=64m
-dalvik.vm.heapsize=256m
-dalvik.vm.heaputilization=0.25
-dalvik.vm.heapidealfree=8388608
-dalvik.vm.heapconcurrentstart=2097152
-dalvik.vm.stack-trace-file=/data/anr/traces.txt
 ro.sf.lcd_density=320
 ro.com.google.clientidbase=android-sonyericsson
 ro.com.google.clientidbase.ms=android-sonymobile
