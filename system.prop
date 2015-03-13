@@ -3,8 +3,7 @@
 # system.prop for hikari
 #
 
-# zram 
-sys.zram.size=134217728
+# zram
 sys.zram.enable=true
 
 # Notify the system that the RIL only signals once
