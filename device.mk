@@ -14,9 +14,6 @@
 # limitations under the License.
 #
 
-# define build target(normal/native/loop)
-BUILD_TARGET := normal
-
 # overlay
 DEVICE_PACKAGE_OVERLAYS += device/sony/hikari/overlay
 
@@ -163,31 +160,16 @@ PRODUCT_COPY_FILES += \
 
 # Custom init / uevent
 PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/config/fstab.semc:root/fstab.semc \
     $(LOCAL_PATH)/config/init.semc.rc:root/init.semc.rc \
     $(LOCAL_PATH)/config/init.sony.rc:root/init.sony.rc \
+    $(LOCAL_PATH)/config/init.sony-platform.rc:root/init.sony-platform.rc \
     $(LOCAL_PATH)/config/ueventd.semc.rc:root/ueventd.semc.rc
 
-# Normal/Native/Loop
-ifeq ($(BUILD_TARGET),native)
-    PRODUCT_COPY_FILES += \
-        $(LOCAL_PATH)/config/fstab.semc:root/fstab.semc \
-        $(LOCAL_PATH)/config/init.sony-platform.native.rc:root/init.sony-platform.rc
-else ifeq ($(BUILD_TARGET),loop)
-    PRODUCT_COPY_FILES += \
-        $(LOCAL_PATH)/config/fstab.loop.semc:root/fstab.semc \
-        $(LOCAL_PATH)/config/init.sony-platform.loop.rc:root/init.sony-platform.rc
-    PRODUCT_PACKAGES += \
-        losetup-static
-else
-    PRODUCT_COPY_FILES += \
-        $(LOCAL_PATH)/config/fstab.semc:root/fstab.semc \
-        $(LOCAL_PATH)/config/init.sony-platform.rc:root/init.sony-platform.rc
-    PRODUCT_PACKAGES += \
-        busybox-static \
-        extract_elf_ramdisk \
-        init.sh \
-        recovery.sh
-endif
+PRODUCT_PACKAGES += \
+    busybox-static \
+    extract_elf_ramdisk \
+    init.sh
 
 # USB
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
