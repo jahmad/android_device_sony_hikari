@@ -175,9 +175,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/ueventd.semc.rc:root/ueventd.semc.rc
 
 PRODUCT_PACKAGES += \
-    busybox-static \
-    extract_elf_ramdisk \
-    init.sh
+    extract_elf_ramdisk
 
 # USB
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \

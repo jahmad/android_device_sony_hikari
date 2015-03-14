@@ -1,79 +1,86 @@
-#!/sbin/busybox-static sh
+#!/sbin/busybox sh
+set +x
+_PATH="$PATH"
+export PATH=/sbin
 
-###########################################################################
+RED_LED="/sys/class/leds/red/brightness"
+GREEN_LED="/sys/class/leds/green/brightness"
+BLUE_LED="/sys/class/leds/blue/brightness"
 
-BUSYBOX=/sbin/busybox-static
-EXTRACT_RAMDISK=/sbin/extract_elf_ramdisk
-KEYCHECK=/dev/keycheck
-RAMDISK=/ramdisk.cpio
+EVENT_NODE="/dev/input/event1 c 13 65"
+EVENT="/dev/input/event1"
+FOTA_NODE="/dev/block/mmcblk0p11 b 179 11"
+FOTA="/dev/block/mmcblk0p11"
 
-LED_RED=/sys/class/leds/red/brightness
-LED_GREEN=/sys/class/leds/green/brightness
-LED_BLUE=/sys/class/leds/blue/brightness
+busybox cd /
+busybox date >>boot.txt
+exec >>boot.txt 2>&1
+busybox rm /init
 
-###########################################################################
+# create directories
+busybox mkdir -m 755 -p /dev/block
+busybox mkdir -m 755 -p /dev/input
+busybox mkdir -m 555 -p /proc
+busybox mkdir -m 755 -p /sys
 
-$BUSYBOX mknod -m 666 /dev/null c 1 3
+# create device nodes
+busybox mknod -m 600 /dev/block/mmcblk0 b 179 0
+busybox mknod -m 600 ${EVENT_NODE}
+busybox mknod -m 666 /dev/null c 1 3
 
-$BUSYBOX mkdir -m 755 /recovery
+# mount filesystems
+busybox mount -t proc proc /proc
+busybox mount -t sysfs sysfs /sys
 
-# extract ram disk
-$BUSYBOX mkdir -m 755 /dev/block
-$BUSYBOX mknod -m 600 /dev/block/mmcblk0p11 b 179 11
-$EXTRACT_RAMDISK -i /dev/block/mmcblk0p11 -o /recovery$RAMDISK -c
+# trigger ON amber LED
+busybox echo 255 > ${RED_LED}
+busybox echo 0 > ${GREEN_LED}
+busybox echo 255 > ${BLUE_LED}
 
-if [ -s /recovery$RAMDISK ]; then
-    LOAD_RECOVERY=
-    $BUSYBOX mount -t sysfs sysfs /sys
-    $BUSYBOX mount -t proc proc /proc
+# keycheck
+busybox cat ${EVENT} > /dev/keycheck&
+busybox sleep 3
 
-    if $BUSYBOX grep -q warmboot=0x77665502 /proc/cmdline; then
-        LOAD_RECOVERY=1
-    else
-        # trigger amber LED
-        $BUSYBOX echo 255 > $LED_RED
-        $BUSYBOX echo 0 > $LED_GREEN
-        $BUSYBOX echo 255 > $LED_BLUE
+# trigger OFF amber LED
+busybox echo 0 > ${RED_LED}
+busybox echo 0 > ${GREEN_LED}
+busybox echo 0 > ${BLUE_LED}
 
-        # key check
-        $BUSYBOX mkdir -m 755 /dev/input
-        $BUSYBOX mknod -m 660 /dev/input/event1 c 13 65
-        $BUSYBOX cat /dev/input/event1 > $KEYCHECK&
-        $BUSYBOX sleep 3
-        kill $!
-        if [ -s $KEYCHECK ]; then
-            LOAD_RECOVERY=1
-        fi
-    fi
+# android ramdisk
+load_image=/sbin/ramdisk.cpio
 
-    if [ $LOAD_RECOVERY ]; then
-        # trigger blue LED
-        $BUSYBOX echo 0 > $LED_RED
-        $BUSYBOX echo 0 > $LED_GREEN
-        $BUSYBOX echo 255 > $LED_BLUE
-    else
-        # turn off LED
-        $BUSYBOX echo 0 > $LED_RED
-        $BUSYBOX echo 0 > $LED_GREEN
-        $BUSYBOX echo 0 > $LED_BLUE
-    fi
-
-    $BUSYBOX umount /proc
-    $BUSYBOX umount /sys
-
-    if [ $LOAD_RECOVERY ]; then
-        $BUSYBOX mkdir -m 755 /recovery/sbin
-        $BUSYBOX ln $BUSYBOX /recovery$BUSYBOX
-        $BUSYBOX chroot /recovery $BUSYBOX cpio -i -F $RAMDISK
-        $BUSYBOX rm /recovery$RAMDISK
-        if [ ! -s /recovery/sbin/mkfs.f2fs ]; then
-            $BUSYBOX cp /sbin/mkfs.f2fs /recovery/sbin/
-        fi
-        exec $BUSYBOX chroot /recovery /init
-    fi
+# boot decision
+if [ -s /dev/keycheck ] || busybox grep -q warmboot=0x77665502 /proc/cmdline ; then
+    busybox echo 'RECOVERY BOOT' >>boot.txt
+    # cyan led for recoveryboot
+    busybox echo 0 > ${RED_LED}
+    busybox echo 255 > ${GREEN_LED}
+    busybox echo 255 > ${BLUE_LED}
+    # recovery ramdisk
+    busybox mknod -m 600 ${FOTA_NODE}
+    busybox mount -o remount,rw /
+    busybox ln -sf /sbin/busybox /sbin/sh
+    extract_elf_ramdisk -i ${FOTA} -o /sbin/ramdisk-recovery.cpio -t / -c
+    busybox rm /sbin/sh
+    load_image=/sbin/ramdisk-recovery.cpio
+else
+    busybox echo 'ANDROID BOOT' >>boot.txt
+    # poweroff LED
+    busybox echo 0 > ${RED_LED}
+    busybox echo 0 > ${GREEN_LED}
+    busybox echo 0 > ${BLUE_LED}
 fi
 
-$BUSYBOX rm -rf /recovery
-$BUSYBOX rm -rf /dev
+# kill the keycheck process
+busybox pkill -f "busybox cat ${EVENT}"
 
+# unpack the ramdisk image
+busybox cpio -i < ${load_image}
+
+busybox umount /proc
+busybox umount /sys
+
+busybox rm -fr /dev/*
+busybox date >>boot.txt
+export PATH="${_PATH}"
 exec /init
