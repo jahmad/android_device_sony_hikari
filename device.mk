@@ -174,6 +174,11 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/init.sony-platform.rc:root/init.sony-platform.rc \
     $(LOCAL_PATH)/rootdir/ueventd.semc.rc:root/ueventd.semc.rc
 
+# Recovery
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/init.recovery.semc.rc:root/init.recovery.semc.rc \
+    $(LOCAL_PATH)/recovery/twrp.fstab:recovery/root/etc/twrp.fstab
+
 PRODUCT_PACKAGES += \
     extract_elf_ramdisk
 

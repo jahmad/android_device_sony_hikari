@@ -86,6 +86,8 @@ BOARD_HAVE_FMRADIO_BCM := true
 BOARD_KERNEL_MSM := true
 TARGET_KERNEL_SOURCE := kernel/sony/fuji
 TARGET_KERNEL_CONFIG := fuji_hikari_defconfig
+BOARD_KERNEL_CMDLINE := # This is ignored by sony's bootloader
+BOARD_KERNEL_PAGESIZE := 2048
 
 # SELinux
 include device/qcom/sepolicy/sepolicy.mk
@@ -96,21 +98,27 @@ TARGET_BOOTLOADER_BOARD_NAME := fuji
 TARGET_VENDOR_PLATFORM := fuji
 
 TARGET_NO_BOOTLOADER := true
-TARGET_NO_RECOVERY := true
+TARGET_NO_RECOVERY := false
 TARGET_NO_RADIOIMAGE := true
 TARGET_BOOTLOADER_TYPE := fastboot
 
 # image
 TARGET_USERIMAGES_USE_EXT4 := true
+BOARD_BOOTIMAGE_PARTITION_SIZE := 0x01400000
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 0x01400000
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1056964608
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 2147483648
 BOARD_FLASH_BLOCK_SIZE := 131072
 
-BOARD_CUSTOM_MKBOOTIMG := device/sony/hikari/tools/mkelf.py
-BOARD_MKBOOTIMG_ARGS := \
-	out/target/product/hikari/kernel@0x40208000 \
-	out/target/product/hikari/ramdisk.img@0x41500000,ramdisk \
-	vendor/sony/hikari/proprietary/boot/RPM.bin@0x20000,rpm
+BOARD_CUSTOM_BOOTIMG_MK := device/sony/hikari/custombootimg.mk
+
+# recovery
+TARGET_OTA_ASSERT_DEVICE := LT26w,hikari
+TARGET_RECOVERY_FSTAB := device/sony/hikari/rootdir/fstab.semc
+TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
+RECOVERY_GRAPHICS_USE_LINELENGTH := true
+TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
+DEVICE_RESOLUTION := 720x1280
 
 # CM Hardware
 BOARD_HARDWARE_CLASS := device/sony/hikari/cmhw/
