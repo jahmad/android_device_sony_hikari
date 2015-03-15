@@ -35,7 +35,7 @@ PRODUCT_PACKAGES += \
 
 # Light
 PRODUCT_PACKAGES += \
-    lights.semc
+    lights.msm8660
 
 # Display
 PRODUCT_PACKAGES += \
