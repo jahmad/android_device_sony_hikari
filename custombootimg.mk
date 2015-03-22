@@ -6,7 +6,14 @@ $(uncompressed_ramdisk): $(INSTALLED_RAMDISK_TARGET)
 	$(hide) $(MKBOOTFS) $(TARGET_ROOT_OUT) > $@
 
 $(recovery_uncompressed_ramdisk): $(recovery_ramdisk) $(TARGET_RECOVERY_ROOT_OUT)/etc/twrp.fstab
+	$(hide) sed -n -i '/ro.adb.secure=1/!p' $(TARGET_RECOVERY_ROOT_OUT)/default.prop
+	$(hide) sed -n -i '/ro.secure=1/!p' $(TARGET_RECOVERY_ROOT_OUT)/default.prop
+
 	$(hide) $(MKBOOTFS) $(TARGET_RECOVERY_ROOT_OUT) > $@
+
+new_recovery_ramdisk := $(PRODUCT_OUT)/new_recovery-ramdisk.img
+$(new_recovery_ramdisk): $(MKBOOTIMG) $(recovery_uncompressed_ramdisk)
+	$(hide) $(MINIGZIP) -c $(new_recovery_ramdisk) > $@
 
 $(INSTALLED_BOOTIMAGE_TARGET): $(MKBOOTIMG) $(INSTALLED_KERNEL_TARGET) $(uncompressed_ramdisk) $(recovery_uncompressed_ramdisk) $(INITSH) $(MINIGZIP) $(PRODUCT_OUT)/utilities/busybox $(PRODUCT_OUT)/utilities/extract_elf_ramdisk
 	$(call pretty,"Boot image: $@")
@@ -32,10 +39,10 @@ $(INSTALLED_BOOTIMAGE_TARGET): $(MKBOOTIMG) $(INSTALLED_KERNEL_TARGET) $(uncompr
 	    vendor/sony/hikari/proprietary/boot/RPM.bin@0x20000,rpm
 	$(hide) $(call assert-max-image-size,$@,$(BOARD_BOOTIMAGE_PARTITION_SIZE))
 
-$(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(INSTALLED_KERNEL_TARGET) $(recovery_ramdisk)
+$(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(INSTALLED_KERNEL_TARGET) $(new_recovery_ramdisk)
 	$(call pretty,"Recovery image: $@")
 	$(hide) $(MKBOOTIMG) -o $@ \
 	    $(INSTALLED_KERNEL_TARGET)@0x40208000 \
-	    $(recovery_ramdisk)@0x41500000,ramdisk \
+	    $(new_recovery_ramdisk)@0x41500000,ramdisk \
 	    vendor/sony/hikari/proprietary/boot/RPM.bin@0x20000,rpm
 	$(hide) $(call assert-max-image-size,$@,$(BOARD_RECOVERYIMAGE_PARTITION_SIZE))
