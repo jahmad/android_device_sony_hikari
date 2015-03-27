@@ -160,7 +160,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/init.qcom.class_main.sh:root/init.qcom.class_main.sh \
     $(LOCAL_PATH)/rootdir/system/etc/init.netconfig.sh:system/etc/init.netconfig.sh \
     $(LOCAL_PATH)/rootdir/system/etc/init.qcom.efs.sync.sh:system/etc/init.qcom.efs.sync.sh \
-    $(LOCAL_PATH)/rootdir/system/etc/init.qcom.fm.sh:system/etc/init.qcom.fm.sh \
     $(LOCAL_PATH)/rootdir/system/etc/init.qcom.post_boot.sh:system/etc/init.qcom.post_boot.sh \
     $(LOCAL_PATH)/rootdir/system/etc/pre_hw_config.sh:system/etc/pre_hw_config.sh \
     $(LOCAL_PATH)/rootdir/system/etc/hw_config.sh:system/etc/hw_config.sh \
@@ -188,12 +187,6 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 
 PRODUCT_PACKAGES += \
     com.android.future.usb.accessory
-
-# Fm radio
-PRODUCT_PACKAGES += \
-    com.stericsson.hardware.fm \
-    com.stericsson.hardware.fm.xml \
-    FmRadio
 
 # Key layouts and touchscreen
 PRODUCT_COPY_FILES += \
