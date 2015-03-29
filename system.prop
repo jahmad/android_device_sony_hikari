@@ -1,11 +1,3 @@
-
-#
-# system.prop for hikari
-#
-
-# zram
-sys.zram.enable=true
-
 # Notify the system that the RIL only signals once
 ro.telephony.call_ring.multiple=false
 

@@ -83,7 +83,10 @@ on init
 
 on fs
     # mount mmc partitions
-    mount_all fstab.semc
+    mount_all /fstab.semc
+
+    # start zram
+    swapon_all /fstab.semc
 
     setprop ro.crypto.fuse_sdcard true
 
@@ -467,13 +470,6 @@ on property:service.adb.root=1
 
 on property:sys.radio.shutdown=true
    exec /system/bin/sh /system/etc/init.qcom.efs.sync.sh
-
-on property:sys.zram.enable=true
-    swapon_all /fstab.semc
-
-on property:sys.zram.enable=false
-    exec /system/bin/swapoff /dev/block/zram0
-    write /sys/block/zram0/reset 1
 
 on property:dev.bootcomplete=1
     start setssflagbc
