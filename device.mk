@@ -168,6 +168,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/fstab.semc:root/fstab.semc \
     $(LOCAL_PATH)/rootdir/init.semc.rc:root/init.semc.rc \
+    $(LOCAL_PATH)/rootdir/init.semc.service.rc:root/init.semc.service.rc \
     $(LOCAL_PATH)/rootdir/init.semc.usb.rc:root/init.semc.usb.rc \
     $(LOCAL_PATH)/rootdir/ueventd.semc.rc:root/ueventd.semc.rc
 
