@@ -155,7 +155,6 @@ PRODUCT_COPY_FILES += \
 # Common Qualcomm / Sony scripts
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/system/etc/init.netconfig.sh:system/etc/init.netconfig.sh \
-    $(LOCAL_PATH)/rootdir/system/etc/init.qcom.efs.sync.sh:system/etc/init.qcom.efs.sync.sh \
     $(LOCAL_PATH)/rootdir/system/etc/pre_hw_config.sh:system/etc/pre_hw_config.sh \
     $(LOCAL_PATH)/rootdir/system/etc/hw_config.sh:system/etc/hw_config.sh \
     $(LOCAL_PATH)/rootdir/system/etc/clearpad_fwloader.sh:system/etc/clearpad_fwloader.sh
