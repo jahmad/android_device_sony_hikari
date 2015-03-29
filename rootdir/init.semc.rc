@@ -28,33 +28,6 @@
 import /init.semc.service.rc
 import /init.semc.usb.rc
 
-on init
-    # Set permissions for persist partition
-    mkdir /persist 0771 system system
-
-    # create mountpoints
-    export EXTERNAL_STORAGE /storage/sdcard0
-    export MEDIA_STORAGE /mnt/media_rw/sdcard0
-    export SECONDARY_STORAGE /storage/sdcard1
-    mkdir /storage 0050 system sdcard_r
-    mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
-    mkdir /storage/sdcard0 0700 root root
-    mkdir /mnt/media_rw/sdcard1 0700 media_rw media_rw
-    mkdir /storage/sdcard1 0700 root root
-    mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
-    mkdir /storage/usbdisk 0700 root root
-
-    # for backwards compatibility
-    symlink /storage/sdcard0 /sdcard
-    symlink /storage/sdcard0 /mnt/sdcard
-    symlink /storage/sdcard1 /external_sd
-    symlink /storage/sdcard1 /mnt/external_sd
-    symlink /storage/usbdisk /usbdisk
-    symlink /storage/usbdisk /mnt/usbdisk
-
-on early-boot
-    # set RLIMIT_MEMLOCK to 64MB
-    setrlimit 8 67108864 67108864
 
 on early-init
     # use legacy virtual address layout, our camera blobs relyon it
@@ -74,85 +47,85 @@ on early-init
     # the modem firmware early.
     exec /system/bin/dd if=/dev/smd0 of=/dev/null bs=1 count=1 skip=1
 
-on boot
-    #Create QMUX deamon socket area
-    mkdir /dev/socket/qmux_radio 0770 radio radio
-    chmod 2770 /dev/socket/qmux_radio
-    mkdir /dev/socket/qmux_audio 0770 media audio
-    chmod 2770 /dev/socket/qmux_audio
-    mkdir /dev/socket/qmux_bluetooth 0770 bluetooth bluetooth
-    chmod 2770 /dev/socket/qmux_bluetooth
-    mkdir /dev/socket/qmux_gps 0770 gps gps
-    chmod 2770 /dev/socket/qmux_gps
 
-    # Allow QMUX daemon to assign port open wait time
-    chown radio radio /sys/devices/virtual/hsicctl/hsicctl0/modem_wait
+on init
+    # create USB host bus directory here so that libusbhost
+    # can start monitoring.
+    mkdir /dev/bus 0755 root root
+    mkdir /dev/bus/usb 0755 root root
 
-    setprop ro.telephony.call_ring.multiple false
+    # use system_monitor
+    symlink /dev/socket /tmp
 
-    #Set SUID bit for usbhub
-    chmod 4755 /system/bin/usbhub
-    chmod 755 /system/bin/usbhub_init
+    # Set permissions for persist partition
+    mkdir /persist 0771 system system
 
-    #Remove SUID bit for iproute2 ip tool
-    chmod 0755 /system/bin/ip
+    # create mountpoints
+    mkdir /storage 0050 system sdcard_r
+    mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
+    mkdir /storage/sdcard0 0700 root root
+    mkdir /mnt/media_rw/sdcard1 0700 media_rw media_rw
+    mkdir /storage/sdcard1 0700 root root
+    mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
+    mkdir /storage/usbdisk 0700 root root
 
+    export EXTERNAL_STORAGE /storage/sdcard0
+    export SECONDARY_STORAGE /storage/sdcard1
 
-    chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
-
-    # create symlink for fb1 as HDMI
-    symlink /dev/graphics/fb1 /dev/graphics/hdmi
-
-    # setup permissions for fb1 related nodes
-    chown system graphics /sys/class/graphics/fb1/hpd
-    chmod 0664 /sys/devices/virtual/graphics/fb1/hpd
-    chmod 0664 /sys/devices/virtual/graphics/fb1/video_mode
-    chmod 0664 /sys/devices/virtual/graphics/fb1/format_3d
-
-    # Change owner and group for media server and surface flinger
-    chown system system /sys/devices/virtual/graphics/fb1/format_3d
-
-    #For bridgemgr daemon to inform the USB driver of the correct transport
-    chown radio radio /sys/class/android_usb/f_rmnet_smd_sdio/transport
-
-    #To allow interfaces to get v6 address when tethering is enabled
-    write /proc/sys/net/ipv6/conf/rmnet0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet3/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet4/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet5/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet6/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet7/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio3/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio4/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio5/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio6/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio7/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb3/accept_ra 2
-
-    # To prevent out of order acknowledgements from making
-    # connection tracking to treat them as not belonging to
-    # the connection they belong to.
-    # Otherwise, a weird issue happens in which some long
-    # connections on high-throughput links get dropped when
-    # an ack packet comes out of order
-    write /proc/sys/net/netfilter/nf_conntrack_tcp_be_liberal 1
-
-    # Stamina Mode
-    chown system system /sys/devices/platform/sony_ssm/enable
-    chown system system /sys/devices/platform/sony_ssm/set_late_resume_notifications
-    chown system system /sys/devices/platform/sony_ssm/set_request_next_suspend_prepare_notification
+    # for backwards compatibility
+    symlink /storage/sdcard0 /sdcard
+    symlink /storage/sdcard0 /mnt/sdcard
+    symlink /storage/sdcard1 /external_sd
+    symlink /storage/sdcard1 /mnt/external_sd
+    symlink /storage/usbdisk /usbdisk
+    symlink /storage/usbdisk /mnt/usbdisk
 
 
-# msm specific files that need to be created on /data
+on fs
+    # mount mmc partitions
+    mount_all fstab.semc
+
+    setprop ro.crypto.fuse_sdcard true
+
+    setprop ro.emmc 1
+
+    # SEMC, TA Daemon
+    class_start trimarea
+    exec /system/bin/wait4tad
+    exec /sbin/mr
+    exec /sbin/checkabortedflash
+
+
+on post-fs
+    mkdir /data/radio 0770 radio radio
+
+    # Camera
+    mkdir /data/camera 0771 root camera
+
+    exec /system/bin/rm -r /data/lost+found
+    mkdir /data/lost+found 0700 root root
+
+    mkdir /data/tombstones 0755 system system
+    mkdir /data/crashsms 0711 system system
+    mkdir /data/crashsms/crashes 0755 system system
+    mkdir /data/mediaserver 0740 media media
+
+    # Change to socket location on libkeyctrl/suntory for /data encryption
+    mkdir /dev/socket/suntory 0755 system system
+
+
 on post-fs-data
+    mkdir /data/idd 0755 idd idd
+    mount ext4 /dev/block/platform/msm_sdcc.1/by-num/p10 /data/idd nosuid nodev noatime barrier=0
+    chown idd idd /data/idd
+    chmod 0755 /data/idd
+
+    # USB related initialization
+    chown system system /sys/devices/platform/msm_hsusb/gadget/lun1/file
+    chmod 0660 /sys/devices/platform/msm_hsusb/gadget/lun1/file
+    write /sys/devices/platform/msm_hsusb/gadget/lun0/nofua 1
+    write /sys/devices/platform/msm_hsusb/gadget/lun1/nofua 1
+
     # Create directory used by audio subsystem
     mkdir /data/misc/audio 0770 audio audio
 
@@ -200,136 +173,8 @@ on post-fs-data
     chown system system /sys/devices/platform/mdp.458753/kcal
     chmod 0664 /sys/devices/platform/mdp.458753/kcal
 
-
-on property:init.svc.surfaceflinger=stopped
-    stop ppd
-    stop hdmid
-
-on property:ro.board.platform=msm7630_fusion
-    start usbhub_init
-
-on property:init.svc.wpa_supplicant=stopped
-    stop dhcpcd
-
-on property:vold.decrypt=trigger_restart_framework
-    start qcom-c_main-sh
-
-on property:ro.boot.emmc=true
-    start rmt_storage
-
-on property:ro.use_data_netmgrd=false
-    # netmgr not supported on specific target
-    stop netmgrd
-
-# Adjust socket buffer to enlarge TCP receive window for high bandwidth
-# but only if ro.data.large_tcp_window_size property is set.
-on property:ro.data.large_tcp_window_size=true
-    write /proc/sys/net/ipv4/tcp_adv_win_scale  1
-
-on property:crypto.driver.load=1
-     insmod /system/lib/modules/qce.ko
-     insmod /system/lib/modules/qcedev.ko
-
-on property:crypto.driver.load=0
-     exec /system/bin/rmmod qcedev.ko
-     exec /system/bin/rmmod qce.ko
-
-on property:drmdiag.load=1
-    start drmdiag
-
-on property:drmdiag.load=0
-    stop drmdiag
-
-on property:sys.boot_completed=1
-    start qcom-post-boot
-
-on property:persist.data.ds_fmc_app.mode=1
-    start ds_fmc_appd
-
-on property:persist.ims.regmanager.mode=1
-    start ims_regmanager
-
-on property:ro.data.large_tcp_window_size=true
-    # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
-    write /proc/sys/net/ipv4/tcp_adv_win_scale  1
-
-on property:persist.timed.enable=true
-    start time_daemon
-
-# Restart adbd so it can run as root
-on property:service.adb.root=1
-    write /sys/class/android_usb/android0/enable 0
-    restart adbd
-    write /sys/class/android_usb/android0/enable 1
-
-on property:sys.radio.shutdown=true
-   exec /system/bin/sh /system/etc/init.qcom.efs.sync.sh
-
-on property:sys.zram.enable=true
-    swapon_all /fstab.semc
-
-on property:sys.zram.enable=false
-    exec /system/bin/swapoff /dev/block/zram0
-    write /sys/block/zram0/reset 1
-
-on post-fs
-    mkdir /data/tombstones 0755 system system
-    mkdir /data/crashsms 0711 system system
-    mkdir /data/crashsms/crashes 0755 system system
-    mkdir /data/mediaserver 0740 media media
-
-    # Change to socket location on libkeyctrl/suntory for /data encryption
-    mkdir /dev/socket/suntory 0755 system system
-
-on property:dev.bootcomplete=1
-    start setssflagbc
-
-on property:ro.semc.enable.fast_dormancy=false
-    stop fast-dormancy
-
-on init
-    # create USB host bus directory here so that libusbhost
-    # can start monitoring.
-    mkdir /dev/bus 0755 root root
-    mkdir /dev/bus/usb 0755 root root
-
-    # use system_monitor
-    symlink /dev/socket /tmp
-
-on fs
-    # mount mmc partitions
-    mount_all fstab.semc
-
-    setprop ro.crypto.fuse_sdcard true
-
-    setprop ro.emmc 1
-
-    # SEMC, TA Daemon
-    class_start trimarea
-    exec /system/bin/wait4tad
-    exec /sbin/mr
-    exec /sbin/checkabortedflash
-
-on post-fs
-    mkdir /data/radio 0770 radio radio
-
-    # Camera
-    mkdir /data/camera 0771 root camera
-
-    exec /system/bin/rm -r /data/lost+found
-    mkdir /data/lost+found 0700 root root
-
-on post-fs-data
-    # Clear dalvik cache
-    exec /init.clrdex.sh
-
-    # USB related initialization
-    chown system system /sys/devices/platform/msm_hsusb/gadget/lun1/file
-    chmod 0660 /sys/devices/platform/msm_hsusb/gadget/lun1/file
-    write /sys/devices/platform/msm_hsusb/gadget/lun0/nofua 1
-    write /sys/devices/platform/msm_hsusb/gadget/lun1/nofua 1
-
     setprop vold.post_fs_data_done 1
+
 
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
@@ -337,8 +182,6 @@ on early-boot
 
     #Run pre_hw_config.sh before entering charge only mode.
     exec /system/bin/sh /system/etc/pre_hw_config.sh
-
-
 
     #Start secchan daemon service before entering charge only mode.
     start secchan
@@ -350,6 +193,7 @@ on early-boot
     exec /system/bin/sh /system/etc/clearpad_fwloader.sh
 
     # Permissions for AKM897x sensor
+    chown system system /data/misc/akm_set.txt
     chown system system /sys/class/compass/akm8972/interval
     chown system system /sys/class/compass/akm8972/single
     chown system system /sys/class/compass/akm8972/registers
@@ -399,6 +243,7 @@ on early-boot
 
     # Configurate TCP/IP kernel settings
     exec /system/bin/sh /system/etc/init.netconfig.sh
+
 
 on boot
     mkdir /data/misc/wifi 0770 wifi wifi
@@ -466,7 +311,6 @@ on boot
 
     exec /system/bin/usbeng
 
-
     # Disable C_A_D
     exec system/bin/ctrlaltdel soft
 
@@ -489,6 +333,154 @@ on boot
     # Do not power down SIM in flight mode (required for Wi-Fi EAP-SIM)
     setprop persist.radio.apm_sim_not_pwdn 0
 
+    #Create QMUX deamon socket area
+    mkdir /dev/socket/qmux_radio 0770 radio radio
+    chmod 2770 /dev/socket/qmux_radio
+    mkdir /dev/socket/qmux_audio 0770 media audio
+    chmod 2770 /dev/socket/qmux_audio
+    mkdir /dev/socket/qmux_bluetooth 0770 bluetooth bluetooth
+    chmod 2770 /dev/socket/qmux_bluetooth
+    mkdir /dev/socket/qmux_gps 0770 gps gps
+    chmod 2770 /dev/socket/qmux_gps
+
+    # Allow QMUX daemon to assign port open wait time
+    chown radio radio /sys/devices/virtual/hsicctl/hsicctl0/modem_wait
+
+    setprop ro.telephony.call_ring.multiple false
+
+    #Set SUID bit for usbhub
+    chmod 4755 /system/bin/usbhub
+    chmod 755 /system/bin/usbhub_init
+
+    #Remove SUID bit for iproute2 ip tool
+    chmod 0755 /system/bin/ip
+
+    chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
+
+    # create symlink for fb1 as HDMI
+    symlink /dev/graphics/fb1 /dev/graphics/hdmi
+
+    # setup permissions for fb1 related nodes
+    chown system graphics /sys/class/graphics/fb1/hpd
+    chmod 0664 /sys/devices/virtual/graphics/fb1/hpd
+    chmod 0664 /sys/devices/virtual/graphics/fb1/video_mode
+    chmod 0664 /sys/devices/virtual/graphics/fb1/format_3d
+
+    # Change owner and group for media server and surface flinger
+    chown system system /sys/devices/virtual/graphics/fb1/format_3d
+
+    #For bridgemgr daemon to inform the USB driver of the correct transport
+    chown radio radio /sys/class/android_usb/f_rmnet_smd_sdio/transport
+
+    #To allow interfaces to get v6 address when tethering is enabled
+    write /proc/sys/net/ipv6/conf/rmnet0/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet1/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet2/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet3/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet4/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet5/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet6/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet7/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio0/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio1/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio2/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio3/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio4/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio5/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio6/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio7/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_usb0/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_usb1/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_usb2/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_usb3/accept_ra 2
+
+    # To prevent out of order acknowledgements from making
+    # connection tracking to treat them as not belonging to
+    # the connection they belong to.
+    # Otherwise, a weird issue happens in which some long
+    # connections on high-throughput links get dropped when
+    # an ack packet comes out of order
+    write /proc/sys/net/netfilter/nf_conntrack_tcp_be_liberal 1
+
+    # Stamina Mode
+    chown system system /sys/devices/platform/sony_ssm/enable
+    chown system system /sys/devices/platform/sony_ssm/set_late_resume_notifications
+    chown system system /sys/devices/platform/sony_ssm/set_request_next_suspend_prepare_notification
+
+
+on property:init.svc.surfaceflinger=stopped
+    stop ppd
+    stop hdmid
+
+on property:ro.board.platform=msm7630_fusion
+    start usbhub_init
+
+on property:init.svc.wpa_supplicant=stopped
+    stop dhcpcd
+
+on property:vold.decrypt=trigger_restart_framework
+    start qcom-c_main-sh
+
+on property:ro.boot.emmc=true
+    start rmt_storage
+
+on property:ro.use_data_netmgrd=false
+    # netmgr not supported on specific target
+    stop netmgrd
+
+# Adjust socket buffer to enlarge TCP receive window for high bandwidth
+# but only if ro.data.large_tcp_window_size property is set.
+on property:ro.data.large_tcp_window_size=true
+    write /proc/sys/net/ipv4/tcp_adv_win_scale  1
+
+on property:crypto.driver.load=1
+     insmod /system/lib/modules/qce.ko
+     insmod /system/lib/modules/qcedev.ko
+
+on property:crypto.driver.load=0
+     exec /system/bin/rmmod qcedev.ko
+     exec /system/bin/rmmod qce.ko
+
+on property:drmdiag.load=1
+    start drmdiag
+
+on property:drmdiag.load=0
+    stop drmdiag
+
+on property:sys.boot_completed=1
+    start qcom-post-boot
+
+on property:persist.data.ds_fmc_app.mode=1
+    start ds_fmc_appd
+
+on property:persist.ims.regmanager.mode=1
+    start ims_regmanager
+
+on property:persist.timed.enable=true
+    start time_daemon
+
+# Restart adbd so it can run as root
+on property:service.adb.root=1
+    write /sys/class/android_usb/android0/enable 0
+    restart adbd
+    write /sys/class/android_usb/android0/enable 1
+
+on property:sys.radio.shutdown=true
+   exec /system/bin/sh /system/etc/init.qcom.efs.sync.sh
+
+on property:sys.zram.enable=true
+    swapon_all /fstab.semc
+
+on property:sys.zram.enable=false
+    exec /system/bin/swapoff /dev/block/zram0
+    write /sys/block/zram0/reset 1
+
+on property:dev.bootcomplete=1
+    start setssflagbc
+
+on property:ro.semc.enable.fast_dormancy=false
+    stop fast-dormancy
+
 on property:ro.emmc=1
     start updatemiscta
     start rmt_storage
@@ -500,22 +492,5 @@ on property:init.svc.bootanim=stopped
 on property:sys.shutdown.requested=*
    exec /system/bin/fstune
 
-
-on early-boot
-   # Permissions for AKM897x sensor
-   chown system system /data/misc/akm_set.txt
-
-on post-fs-data
-    mkdir /data/idd 0755 idd idd
-    mount ext4 /dev/block/platform/msm_sdcc.1/by-num/p10 /data/idd nosuid nodev noatime barrier=0
-    chown idd idd /data/idd
-    chmod 0755 /data/idd
-
 on property:ro.nvcust=1
     start nvcustomizer
-
-on property:vold.decrypt=trigger_post_fs_data
-    mkdir /data/idd 0755 idd idd
-    mount ext4 /dev/block/mmcblk0p10 /data/idd nosuid nodev noatime barrier=0
-    chown idd idd /data/idd
-    chmod 0755 /data/idd
