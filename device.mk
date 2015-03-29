@@ -169,8 +169,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/fstab.semc:root/fstab.semc \
     $(LOCAL_PATH)/rootdir/init.semc.rc:root/init.semc.rc \
-    $(LOCAL_PATH)/rootdir/init.sony.rc:root/init.sony.rc \
-    $(LOCAL_PATH)/rootdir/init.sony-platform.rc:root/init.sony-platform.rc \
     $(LOCAL_PATH)/rootdir/ueventd.semc.rc:root/ueventd.semc.rc
 
 # Recovery
