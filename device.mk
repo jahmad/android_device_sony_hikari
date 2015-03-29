@@ -59,8 +59,8 @@ PRODUCT_PACKAGES += \
     audio.primary.msm8660 \
     audio.a2dp.default \
     audio.usb.default \
-	audio.r_submix.default \
-	libaudio-resampler
+    audio.r_submix.default \
+    libaudio-resampler
 
 PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \

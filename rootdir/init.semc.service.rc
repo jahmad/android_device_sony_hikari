@@ -1,35 +1,28 @@
-# Export GPIO56 for fusion targets to enable/disable hub
-service usbhub_init /system/bin/usbhub_init
-    class late_start
+service charger /charger
+    class charger
+
+
+# SEMC, TA Daemon
+service tad /system/bin/tad /dev/block/mmcblk0p1 0,16,256
     user root
-    disabled
+    group root
+    socket tad stream 0660 system system
+    class trimarea
+
+# SEMC, TA rmt service
+service ta_rmt_service /system/bin/ta_rmt_service
+    class emmc
+    user root
+
+service rmt_storage /system/bin/rmt_storage
+    class emmc
+    user root
+
+service updatemiscta /system/bin/updatemiscta
+    class emmc
+    user root
     oneshot
 
-service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
-    class late_start
-    user bluetooth
-    group bluetooth net_bt_admin inet
-    disabled
-    oneshot
-
-service bt-sap /system/bin/sapd 15
-    user bluetooth
-    group bluetooth net_bt_admin
-    class late_start
-    disabled
-    oneshot
-
-service bridgemgrd /system/bin/bridgemgrd
-    class late_start
-    user radio
-    group radio qcom_diag
-    disabled
-
-service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
-    class late_start
-    user system
-    group system inet
-    disabled
 
 # QMUX must be in multiple groups to support external process connections
 service qmuxd /system/bin/qmuxd
@@ -40,78 +33,29 @@ service qmuxd /system/bin/qmuxd
 service netmgrd /system/bin/netmgrd
     class main
 
-service drmdiag /system/bin/drmdiagapp
-    class late_start
-    user root
-    disabled
-    oneshot
-
-service ppd /system/bin/mm-pp-daemon
-    class late_start
-    user system
-    socket pps stream 0660 system system graphics
-    group system graphics
-
-service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
-    class late_start
-    user root
-    group root
-    oneshot
-    disabled
-
-service ds_fmc_appd /system/bin/ds_fmc_appd -p "rmnet0" -D
-    class late_start
-    group radio wifi inet
-    disabled
-    oneshot
-
-service time_daemon /system/bin/time_daemon
-    class late_start
-    user root
-    group root
-    oneshot
-    disabled
-
-# FUSE sdcard daemon for rich permissions (runs as media_rw)
-service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
-    class late_start
-    disabled
-
-service fuse_sdcard1 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1
-    class late_start
-    disabled
-
-service fuse_usbdisk /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk /storage/usbdisk
-    class late_start
-    disabled
-
-service charger /charger
-    class charger
-
-service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
-    class late_start
-    user root
-    disabled
-
-service qosmgrd /system/bin/qosmgr /system/etc/qosmgr_rules.xml
-    user system
-    group system
-    disabled
-
-service qrngd /system/bin/qrngd -f
-    class late_start
-    user root
-
 service iddd /system/bin/iddd
     class main
     user idd
     group idd log
 
-# Set the startup flag to boot complete, run on property change
-service setssflagbc /system/bin/startupflag bootcomplete
+service secchan /system/bin/secchand
+    class main
+    user system
+    group system
+
+service touchd /system/bin/touchd
+    class main
+
+# Copy calibration data from NV to kernel drivers
+service nvimport /system/bin/nvimport
+    class main
     user root
     oneshot
-    disabled
+
+service hw_config /system/bin/sh /system/etc/hw_config.sh
+    class main
+    user root
+    oneshot
 
 # Start suntrold
 service suntrold /system/bin/suntrold
@@ -126,40 +70,12 @@ service fast-dormancy /system/bin/fast-dormancy
     user root
     group root inet net_raw net_admin
 
-service secchan /system/bin/secchand
-    class main
-    user system
-    group system
-
-# SEMC, TA Daemon
-service tad /system/bin/tad /dev/block/mmcblk0p1 0,16,256
-    user root
-    group root
-    socket tad stream 0660 system system
-    class trimarea
-
 service illumination /system/bin/illumination_service
     socket illumination stream 0666 root system
     class main
     user root
     group system
     disabled
-
-service hw_config /system/bin/sh /system/etc/hw_config.sh
-    class main
-    user root
-    oneshot
-
-service updatemiscta /system/bin/updatemiscta
-    class emmc
-    user root
-    oneshot
-
-service btld /system/bin/btld -lpm 1
-    user root
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
 
 service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm \
     --use_baudrate_for_download --tosleep 20000 --scopcm 0,4,0,0,0,0,0,0,3,0 \
@@ -169,17 +85,6 @@ service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm \
     group bluetooth net_bt_admin
     disabled
     class main
-
-# SEMC, TA rmt service
-service ta_rmt_service /system/bin/ta_rmt_service
-    class emmc
-    user root
-
-# Copy calibration data from NV to kernel drivers
-service nvimport /system/bin/nvimport
-    class main
-    user root
-    oneshot
 
 service p2p_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
@@ -242,14 +147,112 @@ service iprenew_bt-pan /system/bin/dhcpcd -n
     disabled
     oneshot
 
-service touchd /system/bin/touchd
-    class main
+
+service ppd /system/bin/mm-pp-daemon
+    class late_start
+    user system
+    socket pps stream 0660 system system graphics
+    group system graphics
+
+service qrngd /system/bin/qrngd -f
+    class late_start
+    user root
+
+# Export GPIO56 for fusion targets to enable/disable hub
+service usbhub_init /system/bin/usbhub_init
+    class late_start
+    user root
+    disabled
+    oneshot
+
+service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
+    class late_start
+    user bluetooth
+    group bluetooth net_bt_admin inet
+    disabled
+    oneshot
+
+service bt-sap /system/bin/sapd 15
+    user bluetooth
+    group bluetooth net_bt_admin
+    class late_start
+    disabled
+    oneshot
+
+service bridgemgrd /system/bin/bridgemgrd
+    class late_start
+    user radio
+    group radio qcom_diag
+    disabled
+
+service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
+    class late_start
+    user system
+    group system inet
+    disabled
+
+service drmdiag /system/bin/drmdiagapp
+    class late_start
+    user root
+    disabled
+    oneshot
+
+service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
+    class late_start
+    user root
+    group root
+    oneshot
+    disabled
+
+service ds_fmc_appd /system/bin/ds_fmc_appd -p "rmnet0" -D
+    class late_start
+    group radio wifi inet
+    disabled
+    oneshot
+
+service time_daemon /system/bin/time_daemon
+    class late_start
+    user root
+    group root
+    oneshot
+    disabled
+
+# FUSE sdcard daemon for rich permissions (runs as media_rw)
+service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
+    class late_start
+    disabled
+
+service fuse_sdcard1 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1
+    class late_start
+    disabled
+
+service fuse_usbdisk /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk /storage/usbdisk
+    class late_start
+    disabled
+
+service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
+    class late_start
+    user root
+    disabled
+
+service qosmgrd /system/bin/qosmgr /system/etc/qosmgr_rules.xml
+    user system
+    group system
+    disabled
+
+# Set the startup flag to boot complete, run on property change
+service setssflagbc /system/bin/startupflag bootcomplete
+    user root
+    oneshot
+    disabled
+
+service btld /system/bin/btld -lpm 1
+    user root
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
 
 service thermald /system/bin/thermald -c /system/etc/thermald-semc.conf
     socket thermald stream 0666 root root
     user root
     disabled
-
-service rmt_storage /system/bin/rmt_storage
-    class emmc
-    user root
