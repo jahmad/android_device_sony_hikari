@@ -87,11 +87,10 @@ on fs
 
     setprop ro.crypto.fuse_sdcard true
 
-    setprop ro.emmc 1
-
     # SEMC, TA Daemon
     class_start trimarea
     exec /system/bin/wait4tad
+    class_start emmc
 
 
 on post-fs
@@ -422,9 +421,6 @@ on property:init.svc.surfaceflinger=stopped
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
 
-on property:ro.boot.emmc=true
-    start rmt_storage
-
 # Adjust socket buffer to enlarge TCP receive window for high bandwidth
 # but only if ro.data.large_tcp_window_size property is set.
 on property:ro.data.large_tcp_window_size=true
@@ -456,11 +452,6 @@ on property:dev.bootcomplete=1
 
 on property:ro.semc.enable.fast_dormancy=false
     stop fast-dormancy
-
-on property:ro.emmc=1
-    start updatemiscta
-    start rmt_storage
-    start ta_rmt_service
 
 on property:init.svc.bootanim=stopped
     start thermald

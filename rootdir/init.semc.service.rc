@@ -151,7 +151,7 @@ service hw_config /system/bin/sh /system/etc/hw_config.sh
     oneshot
 
 service updatemiscta /system/bin/updatemiscta
-    class main
+    class emmc
     user root
     oneshot
 
@@ -172,8 +172,8 @@ service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm \
 
 # SEMC, TA rmt service
 service ta_rmt_service /system/bin/ta_rmt_service
+    class emmc
     user root
-    disabled
 
 # Copy calibration data from NV to kernel drivers
 service nvimport /system/bin/nvimport
@@ -251,5 +251,5 @@ service thermald /system/bin/thermald -c /system/etc/thermald-semc.conf
     disabled
 
 service rmt_storage /system/bin/rmt_storage
+    class emmc
     user root
-    disabled
