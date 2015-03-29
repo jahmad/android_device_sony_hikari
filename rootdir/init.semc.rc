@@ -448,3 +448,5 @@ on property:ro.emmc=1
 on property:init.svc.bootanim=stopped
     start thermald
 
+on property:ro.debuggable=1
+    start console
