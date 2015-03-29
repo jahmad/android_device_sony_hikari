@@ -154,7 +154,6 @@ PRODUCT_COPY_FILES += \
 
 # Common Qualcomm / Sony scripts
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/rootdir/init.usbmode.sh:root/init.usbmode.sh \
     $(LOCAL_PATH)/rootdir/init.qcom.sh:root/init.qcom.sh \
     $(LOCAL_PATH)/rootdir/init.qcom.class_core.sh:root/init.qcom.class_core.sh \
     $(LOCAL_PATH)/rootdir/init.qcom.class_main.sh:root/init.qcom.class_main.sh \
@@ -169,6 +168,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/fstab.semc:root/fstab.semc \
     $(LOCAL_PATH)/rootdir/init.semc.rc:root/init.semc.rc \
+    $(LOCAL_PATH)/rootdir/init.semc.usb.rc:root/init.semc.usb.rc \
     $(LOCAL_PATH)/rootdir/ueventd.semc.rc:root/ueventd.semc.rc
 
 # Recovery
