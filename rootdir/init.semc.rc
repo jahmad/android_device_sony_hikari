@@ -456,9 +456,6 @@ on property:sys.radio.shutdown=true
 on property:dev.bootcomplete=1
     start setssflagbc
 
-on property:ro.semc.enable.fast_dormancy=false
-    stop fast-dormancy
-
 on property:init.svc.bootanim=stopped
     start thermald
     start mpdecision

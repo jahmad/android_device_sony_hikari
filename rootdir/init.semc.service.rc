@@ -69,6 +69,7 @@ service fast-dormancy /system/bin/fast-dormancy
     class main
     user root
     group root inet net_raw net_admin
+    disabled
 
 service illumination /system/bin/illumination_service
     socket illumination stream 0666 root system
